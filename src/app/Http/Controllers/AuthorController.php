@@ -10,7 +10,8 @@ class AuthorController extends Controller
 {
     public function index()
     {
-        $authors = Author::all();
+        $authors = Author::Paginate(4);
+        \Log::info('Authors count: ' . $authors->count());
         return view('index', ['authors' => $authors]);
     }
 
@@ -31,7 +32,7 @@ class AuthorController extends Controller
         $author = Author::find($request->id);
         return view('edit', ['form' => $author]);
     }
-    
+
     public function update(AuthorRequest $request)
     {
         $form = $request->all();
@@ -59,9 +60,9 @@ class AuthorController extends Controller
 
     public function relate()
     {
-        $hasItems =Author::has('book')->get();
+        $hasItems = Author::has('book')->get();
         $noItems = Author::doesntHave('book')->get();
         $param = ['hasItems' => $hasItems, 'noItems' => $noItems];
-        return view('author.index',$param);
+        return view('author.index', $param);
     }
 }
