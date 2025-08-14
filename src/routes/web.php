@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\MiddlewareController;
+use App\Models\Person;
+use App\Models\Product;
+use App\Http\Controllers\PenController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -31,5 +35,41 @@ Route::prefix('book')->group(function (){
     Route::post('/add', [BookController::class, 'create']);
 });
 Route::get('/relation', [AuthorController::class, 'relate']);
+Route::get('/middleware', [MiddlewareController::class, 'index']);
+Route::post('/middleware', [MiddlewareController::class, 'post']);
 Route::get('/session', [SessionController::class, 'getSes']);
 Route::post('/session', [SessionController::class, 'postSes']);
+
+Route::get('/softdelete', function () {
+    $person = person::find(11);
+    if ($person) {
+        $person->delete();
+        echo "ID=1 論理削除しました";
+    } else {
+        echo "対象データがありません";
+    }
+});
+
+Route::get('softdelete/get', function() {
+    $person = Person::onlyTrashed()->get();
+    dd($person);
+});
+
+Route::get('softdelete/store', function() {
+    $result = Person::onlyTrashed()->restore();
+    echo $result;
+});
+
+Route::get('softdelete/absolute', function() {
+    $result = Person::onlyTrashed()->forceDelete();
+    echo $result;
+});
+Route::get('uuid', function() {
+    $products = Product::all();
+    foreach($products as $product){
+        echo $product.'<br>';
+    }
+});
+Route::get('fill', [PenController::class,'fillPen']);
+Route::get('create', [PenController::class,'createPen']);
+Route::get('insert', [PenController::class,'insertPen']);
